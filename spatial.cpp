@@ -14,7 +14,7 @@ namespace py = boost::python;
 typedef bg::model::d2::point_xy <double, bg::cs::spherical_equatorial<bg::degree>> GeoPoint;
 typedef std::pair<GeoPoint, py::object> Value;
 typedef bgi::rtree<Value, bgi::rstar<16>> RTree;
-typedef bg::strategy::distance::haversine<double> haversine_type;
+typedef bg::strategy::distance::haversine<double> Haversine;
 
 namespace {
     class PythonRTree {
@@ -40,7 +40,7 @@ namespace {
                 std::vector<Value> result;
                 py::list ret;
                 for (auto it = rtree.qbegin(bgi::nearest(point, num)); it != rtree.qend(); ++it ) {
-                    if (bg::distance((*it).first, point, haversine_type()) > max_distance) {
+                    if (bg::distance((*it).first, point, Haversine()) > max_distance) {
                         break;
                     }
                     ret.append(py::make_tuple((*it).first, (*it).second));
@@ -54,6 +54,10 @@ namespace {
         std::stringstream ss;
         ss << bg::wkt(point);
         return ss.str();
+    }
+
+    double distance(GeoPoint point, GeoPoint other_point) {
+        return bg::distance(point, other_point, Haversine());
     }
 }
 
@@ -70,4 +74,6 @@ BOOST_PYTHON_MODULE(spatial_index)
     ;
 
     py::class_<Value>("Value", py::init<GeoPoint, py::object>());
+
+    py::def("haversine_distance", distance);
 }
