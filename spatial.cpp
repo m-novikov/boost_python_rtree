@@ -29,10 +29,10 @@ namespace {
             }
             py::list nearest(GeoPoint point, unsigned num) {
                 std::vector<Value> result;
-                rtree.query(bgi::nearest(point, num), std::back_inserter(result));
                 py::list ret;
-                for (Value& value : result)
-                    ret.append(py::make_tuple(value.first, value.second));
+                for (auto it = rtree.qbegin(bgi::nearest(point, num)); it != rtree.qend(); ++it ) {
+                    ret.append(py::make_tuple((*it).first, (*it).second));
+                }
                 return ret;
             }
         private:
