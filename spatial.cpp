@@ -27,9 +27,9 @@ namespace {
             void insert(Value value) {
                 rtree.insert(value);
             }
-            py::list nearest(GeoPoint point) {
+            py::list nearest(GeoPoint point, unsigned num) {
                 std::vector<Value> result;
-                rtree.query(bgi::nearest(point, 5), std::back_inserter(result));
+                rtree.query(bgi::nearest(point, num), std::back_inserter(result));
                 py::list ret;
                 for (Value& value : result)
                     ret.append(py::make_tuple(value.first, value.second));
