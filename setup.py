@@ -3,7 +3,7 @@ from setuptools import setup, Extension
 ext1 = Extension(
     'spatial_index', ['spatial.cpp'],
     libraries=['boost_python'],
-    extra_compile_args=['-std=c++11', '-g'],
+    extra_compile_args=['-std=c++0x', '-g'],
 )
 
 
