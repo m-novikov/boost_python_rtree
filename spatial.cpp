@@ -32,7 +32,7 @@ namespace {
                 std::vector<Value> result;
                 py::list ret;
                 for (auto it = rtree.qbegin(bgi::nearest(point, num)); it != rtree.qend(); ++it ) {
-                    ret.append(py::make_tuple((*it).first, (*it).second));
+                    ret.append(*it);
                 }
                 return ret;
             }
@@ -40,10 +40,9 @@ namespace {
                 std::vector<Value> result;
                 py::list ret;
                 for (auto it = rtree.qbegin(bgi::nearest(point, num)); it != rtree.qend(); ++it ) {
-                    if (bg::distance((*it).first, point, Haversine()) > max_distance) {
-                        break;
+                    if (bg::distance((*it).first, point, Haversine()) <= max_distance) {
+                        ret.append(*it);
                     }
-                    ret.append(py::make_tuple((*it).first, (*it).second));
                 }
                 return ret;
             }
@@ -73,7 +72,10 @@ BOOST_PYTHON_MODULE(spatial_index)
         .def("nearest", &PythonRTree::nearest_with_distance)
     ;
 
-    py::class_<Value>("Value", py::init<GeoPoint, py::object>());
+    py::class_<Value>("Value", py::init<GeoPoint, py::object>())
+        .add_property("point", &Value::first)
+        .add_property("data", &Value::second)
+    ;
 
     py::def("haversine_distance", distance);
 }
